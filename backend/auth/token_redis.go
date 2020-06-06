@@ -9,13 +9,18 @@ import (
 var redisClient *redis.Client
 
 func init() {
-	redisClient = redis.NewClient(&redis.Options{
+	redisClient = NewRedisConnection()
+}
+
+func NewRedisConnection() *redis.Client {
+	redisClient := redis.NewClient(&redis.Options{
 		Addr: "localhost:6379",
 	})
 	_, err := redisClient.Ping().Result()
 	if err != nil {
 		panic(err)
 	}
+	return redisClient
 }
 
 type AccessDetails struct {
@@ -23,7 +28,7 @@ type AccessDetails struct {
 	UserId     uint64
 }
 
-func CreateAuth(userid uint64, td *TokenDetails) error {
+func RedisCreateAuth(userid uint64, td *TokenDetails) error {
 	at := time.Unix(td.AtExpires, 0) //converting Unix to UTC(to Time object)
 	rt := time.Unix(td.RtExpires, 0)
 	now := time.Now()
@@ -39,7 +44,7 @@ func CreateAuth(userid uint64, td *TokenDetails) error {
 	return nil
 }
 
-func GetAuth(authD *AccessDetails) (uint64, error) {
+func RedisGetAuth(authD *AccessDetails) (uint64, error) {
 	userid, err := redisClient.Get(authD.AccessUuid).Result()
 	if err != nil {
 		return 0, err
@@ -48,7 +53,7 @@ func GetAuth(authD *AccessDetails) (uint64, error) {
 	return userID, nil
 }
 
-func DeleteAuth(givenUuid string) (int64, error) {
+func RedisDeleteAuth(givenUuid string) (int64, error) {
 	deleted, err := redisClient.Del(givenUuid).Result()
 	if err != nil {
 		return 0, err

@@ -11,9 +11,17 @@ var (
 
 func main() {
 	router.POST("/login", Login)
-	router.POST("/todo", TokenAuthMiddleware(), CreateTodo)
-	router.POST("/logout", TokenAuthMiddleware(), Logout)
 	router.POST("/token/refresh", Refresh)
 
-	log.Fatal(router.Run(":8080"))
+	authorized := router.Group("/", TokenAuthMiddleware())
+	{
+		authorized.POST("/logout", Logout)
+
+		todo := authorized.Group("/todo")
+		{
+			todo.POST("/", CreateTodo)
+		}
+	}
+
+	log.Fatal(router.Run(":8090"))
 }

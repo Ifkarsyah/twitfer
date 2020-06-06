@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/twinj/uuid"
 	"time"
@@ -53,4 +54,13 @@ func createAccessToken(userid uint64, td *TokenDetails) (string, error) {
 	atClaims["exp"] = td.AtExpires
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	return at.SignedString([]byte("ACCESS_SECRET"))
+}
+
+func checkConformHMAC(secret string) func(token *jwt.Token) (interface{}, error) {
+	return func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(secret), nil
+	}
 }

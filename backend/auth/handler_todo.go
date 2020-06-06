@@ -13,22 +13,28 @@ type Todo struct {
 func CreateTodo(c *gin.Context) {
 	var td *Todo
 	if err := c.ShouldBindJSON(&td); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, "invalid json")
+		c.JSON(http.StatusUnprocessableEntity, ErrorResp{List: err.Error()})
 		return
 	}
+
+	// Who make this request?
 	tokenAuth, err := ExtractTokenMetadata(c.Request)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, "unauthorized")
 		return
 	}
-	userId, err := GetAuth(tokenAuth)
+	userId, err := RedisGetAuth(tokenAuth)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, "unauthorized")
 		return
 	}
-	td.UserID = userId
 
-	//you can proceed to save the Todo to a database
-	//but we will just return it to the caller here:
+	// Business Logic: I will do this for you, but not know
+	td.UserID = userId
+	if err := Publish("add_q", c.GetRawData()); err != nil {
+		panic(err)
+	}
+
 	c.JSON(http.StatusCreated, td)
 }
+

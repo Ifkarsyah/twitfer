@@ -11,7 +11,7 @@ func Logout(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, "unauthorized")
 		return
 	}
-	deleted, delErr := DeleteAuth(au.AccessUuid)
+	deleted, delErr := RedisDeleteAuth(au.AccessUuid)
 	if delErr != nil || deleted == 0 { //if any goes wrong
 		c.JSON(http.StatusUnauthorized, "unauthorized")
 		return

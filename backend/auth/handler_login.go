@@ -21,7 +21,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
-	saveErr := CreateAuth(user.ID, ts)
+	saveErr := RedisCreateAuth(user.ID, ts)
 	if saveErr != nil {
 		c.JSON(http.StatusUnprocessableEntity, saveErr.Error())
 	}
