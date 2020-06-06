@@ -1,26 +1,33 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {useRoutes} from 'hookrouter';
+import HomePage from "./pages/Home/HomePage";
+import ProfilePage from "./pages/Profile/ProfilePage";
+import Error404 from "./pages/Error/Error404";
+import SearchPage from "./pages/Search/SearchPage";
+import Tweet from "./components/Tweet/Tweet";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+const routes = {
+    "/home": () => <HomePage/>,
+    "/profile/:username": ({username}) => <ProfilePage username={username}/>,
+    "/tweet/:tweetID": ({tweetID}) => <Tweet tweetID={tweetID}/>,
+    "/search": () => <SearchPage/>
+};
+
+const App = () => {
+    const routeResult = useRoutes(routes);
+
+    // noinspection HtmlUnknownTarget
+    return (
+        <>
+            <a href="/home">Home Page</a> <br/>
+            <a href="/profile/richard">Profile Page</a> <br/>
+            <a href="/tweet/1">Tweet</a> <br/>
+            <a href="/search">Search Page</a> <br/>
+
+            {routeResult || <Error404/>}
+        </>
+    )
 }
 
 export default App;
