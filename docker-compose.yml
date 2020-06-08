@@ -1,0 +1,24 @@
+version: '3'
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: twitfer
+      MYSQL_USER: twitfer
+      MYSQL_PASSWORD: twitfer1234
+    container_name: twitfer-db
+    ports:
+      - "3307:3307"
+    tty: true
+    volumes:
+      - ./volumes/mysql:/var/lib/mysql
+  cache:
+    image: redis:6-alpine
+    container_name: twitfer-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./volumes/redis:/var/lib/redis
+      - ./conf/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
